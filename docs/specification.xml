@@ -1,0 +1,36 @@
+<?xml-stylesheet href="specstyle.css"?>
+<specification>
+    <group name="Clip Editor">
+        <requirement>
+            <design>Devs must be able to add the clip editor in html as a web component.</design>
+        </requirement>
+
+        <requirement>
+            <design>Devs must be able to programmatically link a clip to an editor.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to draw new notes onto the clip.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to select a bend drawing mode, where they can draw bend data onto a clip.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to filter which channels to show data for. By default it will show data for all channels.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to zoom in and out.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to add control change 'channels' to the clip editor. They can then select one of the channels to draw CC data into.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to select a velocity drawing mode, where for each note they can draw in its velocity, either as a constant value, or changing over time.</design>
+        </requirement>
+    </group>
+</specification>
