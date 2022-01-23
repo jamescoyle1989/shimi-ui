@@ -33,4 +33,40 @@
             <design>Users must be able to select a velocity drawing mode, where for each note they can draw in its velocity, either as a constant value, or changing over time.</design>
         </requirement>
     </group>
+
+    <group name="MIDI Out Port Selector">
+        <requirement>
+            <design>Devs must be able to add the selector in html as a web component.</design>
+        </requirement>
+
+        <requirement>
+            <design>Devs must be able to programmatically link a MidiOut object to the selector.</design>
+        </requirement>
+
+        <requirement>
+            <design>Devs must be able to specify a default port name which it tries to connect to.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to select a port from a dropdown list of names.</design>
+        </requirement>
+    </group>
+
+    <group name="MIDI In Port Selector">
+        <requirement>
+            <design>Devs must be able to add the selector in html as a web component.</design>
+        </requirement>
+
+        <requirement>
+            <design>Devs must be able to programmatically link a MidiIn object to the selector.</design>
+        </requirement>
+
+        <requirement>
+            <design>Devs must be able to specify a default port name which it tries to connect to.</design>
+        </requirement>
+
+        <requirement>
+            <design>Users must be able to select a port from a dropdown list of names.</design>
+        </requirement>
+    </group>
 </specification>
