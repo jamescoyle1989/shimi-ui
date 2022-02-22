@@ -1,8 +1,7 @@
 import Vue from 'vue';
-import App from './App.vue';
+import wrap from '@vue/web-component-wrapper';
 
-Vue.config.productionTip = false;
 
-new Vue({
-  render: (h) => h(App),
-}).$mount('#app');
+import MidiOutPicker from './components/MidiOutPicker.vue';
+const wrappedMidiOutPicker: any = wrap(Vue, MidiOutPicker);
+window.customElements.define('midi-out-picker', wrappedMidiOutPicker);
