@@ -1,8 +1,7 @@
-import Vue from 'vue'
-import App from './App.vue'
+import MidiOutPicker from './components/MidiOutPicker.vue';
+import DummyText from './components/DummyText.vue';
 
-Vue.config.productionTip = false
-
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+export default {
+    MidiOutPicker,
+    DummyText
+}
