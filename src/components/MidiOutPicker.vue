@@ -9,8 +9,6 @@ let shimi = window.shimi;
 if (shimi === undefined)
     shimi = require('shimi');
 
-console.log(shimi);
-
 export default {
     name: 'MidiOutPicker',
     props: {

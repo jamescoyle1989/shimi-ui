@@ -37,10 +37,12 @@
     <group name="MIDI Out Port Selector">
         <requirement>
             <design>Devs must be able to add the selector in html as a web component.</design>
+            <implementation>The web component is registered as shimi-ui-midi-out-picker.</implementation>
         </requirement>
 
         <requirement>
             <design>Devs must be able to programmatically link a MidiOut object to the selector.</design>
+            <implementation>The component exposes a .midiOut property which is used for attaching a MidiOut object to it.</implementation>
         </requirement>
 
         <requirement>
@@ -49,6 +51,7 @@
 
         <requirement>
             <design>Users must be able to select a port from a dropdown list of names.</design>
+            <implementation>Once the .midiAccess property has been set, the component will list all out ports that it can find on the MidiAccess object.</implementation>
         </requirement>
     </group>
 
