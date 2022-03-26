@@ -7,4 +7,13 @@ export default class DummyBaseAccess {
             name: 'Test 2'
         }
     ];
+    
+    inputs = [
+        {
+            name: 'Test 3'
+        },
+        {
+            name: 'Test 4'
+        }
+    ];
 }

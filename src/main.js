@@ -1,7 +1,7 @@
+import MidiInPicker from './components/MidiInPicker.vue';
 import MidiOutPicker from './components/MidiOutPicker.vue';
-import DummyText from './components/DummyText.vue';
 
 export default {
-    MidiOutPicker,
-    DummyText
+    MidiInPicker,
+    MidiOutPicker
 }
