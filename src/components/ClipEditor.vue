@@ -7,32 +7,32 @@
 
                 <div v-for="p of pitches" :key="p"
                     :class="pitchIsBlack(p) ? 'sh-clip-black-key' : 'sh-clip-white-key'"
-                    style="height:10px;">
+                    :style="{height: pitchHeight + 'px'}">
 
                     <label v-if="p % 12 == 0">C{{p / 12}}</label>
                 </div>
             </div>
 
-            <svg :viewBox="'0 0 ' + (clipDuration * 100) + ' 1280'"
+            <svg :viewBox="'0 0 ' + (clipDuration * beatWidth) + ' ' + (128 * pitchHeight)"
                 preserveAspectRatio="none" fill="#666666"
                 ref="svgElement" class="sh-clip-edit-area"
                 @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp"
                 @mouseleave="onMouseUp" @contextmenu="onRightClick"
-                :width="clipDuration * 100" :height="1280">
+                :width="clipDuration * beatWidth" :height="128 * pitchHeight">
 
-                <rect x="0" y="0" :width="clipDuration * 100" height="1280" fill="#666"/>
+                <rect x="0" y="0" :width="clipDuration * beatWidth" :height="128 * pitchHeight" fill="#666"/>
 
                 <rect v-for="p of blackPitches" :key="'p' + p"
-                    x="0" :y="(127 - p) * 10" :width="clipDuration * 100" height="10" fill="#555"/>
+                    x="0" :y="(127 - p) * pitchHeight" :width="clipDuration * beatWidth" :height="pitchHeight" fill="#555"/>
 
                 <line v-for="line of beatLines" :key="'b' + line.beat"
-                    :x1="line.beat * 100" y1="-10"
-                    :x2="line.beat * 100" y2="1290"
+                    :x1="line.beat * beatWidth" y1="-10"
+                    :x2="line.beat * beatWidth" :y2="129 * pitchHeight"
                     :class="line.class"/>
 
                 <rect v-for="n of clipNotes" :key="n.id"
-                    :x="n.start * 100" :y="(127 - n.pitch) * 10"
-                    height="10" :width="n.duration * 100"
+                    :x="n.start * beatWidth" :y="(127 - n.pitch) * pitchHeight"
+                    :height="pitchHeight" :width="n.duration * beatWidth"
                     stroke="black" stroke-width="0.5"
                     :fill="getNoteColor(n)"/>
             </svg>
@@ -60,6 +60,14 @@ export default {
         divisionsPerBeat: {
             type: Number,
             default: 2
+        },
+        xZoom: {
+            type: Number,
+            default: 1
+        },
+        yZoom: {
+            type: Number,
+            default: 1
         }
     },
     data: () => {
@@ -111,6 +119,16 @@ export default {
                 return 1;
             return rounded;
         },
+        pitchHeight() {
+            if (this.yZoom <= 0)
+                return 10;
+            return this.yZoom * 10;
+        },
+        beatWidth() {
+            if (this.xZoom <= 0)
+                return 100;
+            return this.xZoom * 100;
+        },
         beatLines() {
             const linesPerBar = [{ beat: 0, class: 'sh-clip-bar-line' }];
             for (let i = 0; i < this.safeBeatsPerBar; i++) {
@@ -147,7 +165,7 @@ export default {
             this.svgPoint.y = evt.clientY;
             const cursorPoint = this.svgPoint.matrixTransform(this.$refs.svgElement.getScreenCTM().inverse());
 
-            return Math.min(Math.max(0, cursorPoint.x / 100), this.clipDuration);
+            return Math.min(Math.max(0, cursorPoint.x / this.beatWidth), this.clipDuration);
         },
         /** beatOffset is how many beats ahead of the point where the mouse is, is the point we actually want to be snapping to */
         getSnappedCursorBeat(evt, beatOffset = 0) {
@@ -156,21 +174,21 @@ export default {
             const cursorPoint = this.svgPoint.matrixTransform(this.$refs.svgElement.getScreenCTM().inverse());
 
             //How many graphical units there are from one beat division to the next
-            const unitsPerDivision = 100 / this.safeDivisionsPerBeat;
-            let diffFromDivision = safeMod(cursorPoint.x + (beatOffset * 100), unitsPerDivision);
+            const unitsPerDivision = this.beatWidth / this.safeDivisionsPerBeat;
+            let diffFromDivision = safeMod(cursorPoint.x + (beatOffset * this.beatWidth), unitsPerDivision);
             if (diffFromDivision > (unitsPerDivision / 2))
                 diffFromDivision -= unitsPerDivision;
             if (Math.abs(diffFromDivision) <= 5)
                 cursorPoint.x -= diffFromDivision;
 
-            return Math.min(Math.max(0, (cursorPoint.x / 100) + beatOffset), this.clipDuration);
+            return Math.min(Math.max(0, (cursorPoint.x / this.beatWidth) + beatOffset), this.clipDuration);
         },
         getCursorPitch(evt) {
             this.svgPoint.x = evt.clientX;
             this.svgPoint.y = evt.clientY;
             const cursorPoint = this.svgPoint.matrixTransform(this.$refs.svgElement.getScreenCTM().inverse());
 
-            return Math.min(Math.max(0, Math.floor((1280 - cursorPoint.y) / 10)), 127);
+            return Math.min(Math.max(0, Math.floor(((128 * this.pitchHeight) - cursorPoint.y) / this.pitchHeight)), 127);
         },
 
         onMouseDown(evt) {
@@ -183,7 +201,7 @@ export default {
             if (this.selectedNote)
                 this.beginNoteDrag(beat);
             else
-                this.addNewNote(evt, pitch)
+                this.addNewNote(evt, pitch);
         },
         onMouseMove(evt) {
             if (this.selectedNote && this.dragMode) {
@@ -237,9 +255,9 @@ export default {
             this.dragOffset = 0;
         },
         beginNoteDrag(mouseBeat) {
-            const noteWidth = this.selectedNote.duration * 100;
-            const startXDiff = (mouseBeat - this.selectedNote.start) * 100;
-            const endXDiff = (this.selectedNote.end - mouseBeat) * 100;
+            const noteWidth = this.selectedNote.duration * this.beatWidth;
+            const startXDiff = (mouseBeat - this.selectedNote.start) * this.beatWidth;
+            const endXDiff = (this.selectedNote.end - mouseBeat) * this.beatWidth;
             let dragMode = 'full';
             if (noteWidth < 20) {
                 if (startXDiff * 4 < noteWidth)
