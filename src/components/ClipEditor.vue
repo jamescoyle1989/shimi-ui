@@ -68,7 +68,15 @@ export default {
             type: Number,
             default: 1
         },
-        scale: shimi.Scale
+        scale: shimi.Scale,
+        minPitch: {
+            type: Number,
+            default: 0
+        },
+        maxPitch: {
+            type: Number,
+            default: 127
+        }
     },
     data: () => {
         return {
@@ -94,7 +102,7 @@ export default {
     computed: {
         pitches() {
             const output = [];
-            for (let i = 127; i >= 0; i--) {
+            for (let i = this.safeMaxPitch; i >= this.safeMinPitch; i--) {
                 if (this.scale && !this.scale.contains(i))
                     continue;
                 output.push(i);
@@ -160,6 +168,17 @@ export default {
                         output.push({ beat: lineBeat, class: line.class });
                 }
             }
+            return output;
+        },
+        safeMinPitch() {
+            console.log('MinPitch:', this.minPitch);
+            return Math.min(Math.max(0, Number(this.minPitch)), 127);
+        },
+        safeMaxPitch() {
+            console.log('MaxPitch:', this.maxPitch);
+            let output = Math.min(Math.max(0, Number(this.maxPitch)), 127);
+            if (output < this.safeMinPitch)
+                output = this.safeMinPitch;
             return output;
         }
     },

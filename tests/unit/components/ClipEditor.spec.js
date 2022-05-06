@@ -20,6 +20,13 @@ describe('ClipEditor', () => {
             expect(pitches.length).toEqual(75);
             expect(pitches[1]).toEqual(125);
             expect(pitches[73]).toEqual(2);
+        }),
+        it('only generates pitches within minPitch & maxPitch range', async () => {
+            await cmp.setProps({ minPitch: 20, maxPitch: 24 });
+            const pitches = cmp.vm.pitches;
+            expect(pitches.length).toEqual(5);
+            expect(pitches[0]).toEqual(24);
+            expect(pitches[4]).toEqual(20);
         })
     }),
 
@@ -86,6 +93,36 @@ describe('ClipEditor', () => {
         it('returns 1 when filtering by D major scale', async () => {
             await cmp.setProps({ scale: ScaleTemplate.major.create(2) });
             expect(cmp.vm.octaveLabelPitch).toEqual(1);
+        })
+    }),
+
+    describe('safeMinPitch', () => {
+        it('is always within MIDI pitch range', async () => {
+            await cmp.setProps({ minPitch: -10 });
+            expect(cmp.vm.safeMinPitch).toEqual(0);
+        }),
+        it('equals valid minPitch values', async () => {
+            await cmp.setProps({ minPitch: 15 });
+            expect(cmp.vm.safeMinPitch).toEqual(15);
+        }),
+        it('handles minPitch as text', async () => {
+            await cmp.setProps({ minPitch: '24' });
+            expect(cmp.vm.safeMinPitch).toEqual(24);
+        })
+    }),
+
+    describe('safeMaxPitch', () => {
+        it('is always within MIDI pitch range', async () => {
+            await cmp.setProps({ maxPitch: -10 });
+            expect(cmp.vm.safeMaxPitch).toEqual(0);
+        }),
+        it('equals valid maxPitch values', async () => {
+            await cmp.setProps({ maxPitch: 15 });
+            expect(cmp.vm.safeMaxPitch).toEqual(15);
+        }),
+        it('is never less than safeMinPitch', async () => {
+            await cmp.setProps({ minPitch: 25, maxPitch: 20 });
+            expect(cmp.vm.safeMaxPitch).toEqual(25);
         })
     })
 });
