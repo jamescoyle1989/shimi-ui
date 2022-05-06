@@ -9,28 +9,28 @@
                     :class="pitchIsBlack(p) ? 'sh-clip-black-key' : 'sh-clip-white-key'"
                     :style="{height: pitchHeight + 'px'}">
 
-                    <label v-if="p % 12 == 0">C{{p / 12}}</label>
+                    <label v-if="p % 12 == octaveLabelPitch">{{getOctaveLabel(p)}}</label>
                 </div>
             </div>
 
-            <svg :viewBox="'0 0 ' + (clipDuration * beatWidth) + ' ' + (128 * pitchHeight)"
+            <svg :viewBox="'0 0 ' + (clipDuration * beatWidth) + ' ' + (pitches.length * pitchHeight)"
                 preserveAspectRatio="none" fill="#666666"
                 ref="svgElement" class="sh-clip-edit-area"
                 @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseUp"
-                :width="clipDuration * beatWidth" :height="128 * pitchHeight">
+                :width="clipDuration * beatWidth" :height="pitches.length * pitchHeight">
 
-                <rect x="0" y="0" :width="clipDuration * beatWidth" :height="128 * pitchHeight" fill="#666"/>
+                <rect x="0" y="0" :width="clipDuration * beatWidth" :height="pitches.length * pitchHeight" fill="#666"/>
 
                 <rect v-for="p of blackPitches" :key="'p' + p"
-                    x="0" :y="(127 - p) * pitchHeight" :width="clipDuration * beatWidth" :height="pitchHeight" fill="#555"/>
+                    x="0" :y="getPitchY(p)" :width="clipDuration * beatWidth" :height="pitchHeight" fill="#555"/>
 
                 <line v-for="line of beatLines" :key="'b' + line.beat"
                     :x1="line.beat * beatWidth" y1="-10"
-                    :x2="line.beat * beatWidth" :y2="129 * pitchHeight"
+                    :x2="line.beat * beatWidth" :y2="(pitches.length + 1) * pitchHeight"
                     :class="line.class"/>
 
-                <rect v-for="n of clipNotes" :key="n.id"
-                    :x="n.start * beatWidth" :y="(127 - n.pitch) * pitchHeight"
+                <rect v-for="n of clipNotes.filter(x => getPitchY(x.pitch))" :key="n.id"
+                    :x="n.start * beatWidth" :y="getPitchY(n.pitch)"
                     :height="pitchHeight" :width="n.duration * beatWidth"
                     stroke="black" stroke-width="0.5"
                     :fill="getNoteColor(n)"/>
@@ -67,7 +67,8 @@ export default {
         yZoom: {
             type: Number,
             default: 1
-        }
+        },
+        scale: shimi.Scale
     },
     data: () => {
         return {
@@ -92,10 +93,21 @@ export default {
     },
     computed: {
         pitches() {
-            return Array.from(Array(128).keys()).reverse();
+            const output = [];
+            for (let i = 127; i >= 0; i--) {
+                if (this.scale && !this.scale.contains(i))
+                    continue;
+                output.push(i);
+            }
+            return output;
+        },
+        octaveLabelPitch() {
+            if (!this.scale)
+                return 0;
+            return Math.min(...this.scale.pitches);
         },
         blackPitches() {
-            return this.pitches.filter(x => this.pitchIsBlack(x));
+            return this.pitches.filter(x => this.pitchIsBlack(x) && this.getPitchY(x) != null);
         },
         clipDuration() {
             if (this.clip)
@@ -187,7 +199,20 @@ export default {
             this.svgPoint.y = evt.clientY;
             const cursorPoint = this.svgPoint.matrixTransform(this.$refs.svgElement.getScreenCTM().inverse());
 
-            return Math.min(Math.max(0, Math.floor(((128 * this.pitchHeight) - cursorPoint.y) / this.pitchHeight)), 127);
+            let index = Math.floor(cursorPoint.y / this.pitchHeight);
+            index = Math.min(Math.max(0, index), 127);
+            return this.pitches[index];
+        },
+        getPitchY(pitch) {
+            let index = this.pitches.indexOf(pitch);
+            if (index < 0)
+                return null;
+            return index * this.pitchHeight;
+        },
+        getOctaveLabel(pitch) {
+            if (!this.scale)
+                return 'C' + (Math.floor(pitch / 12) - 1);
+            return this.scale.getPitchName(pitch, true);
         },
 
         onMouseDown(evt) {
@@ -318,6 +343,12 @@ export default {
 
 .sh-clip-black-key {
     background-color: #000000;
+}
+
+.sh-clip-black-key > label {
+    font-family: sans-serif;
+    font-size: 8px;
+    color: white;
 }
 
 .sh-clip-edit-area {

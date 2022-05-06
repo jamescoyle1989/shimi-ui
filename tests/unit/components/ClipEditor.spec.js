@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import ClipEditor from '@/components/ClipEditor.vue';
-import { Clip, ClipNote } from 'shimi';
+import { Clip, ClipNote, ScaleTemplate } from 'shimi';
 
 describe('ClipEditor', () => {
     let cmp;
@@ -12,6 +12,14 @@ describe('ClipEditor', () => {
             expect(pitches.length).toEqual(128);
             expect(pitches[0]).toEqual(127);
             expect(pitches[127]).toEqual(0);
+        }),
+        it('returns filtered results if scale set', async () => {
+            const scale = ScaleTemplate.major.create(0);
+            await cmp.setProps({ scale: scale });
+            const pitches = cmp.vm.pitches;
+            expect(pitches.length).toEqual(75);
+            expect(pitches[1]).toEqual(125);
+            expect(pitches[73]).toEqual(2);
         })
     }),
 
@@ -68,6 +76,16 @@ describe('ClipEditor', () => {
             expect(beatLines[1].class).toEqual('sh-clip-division-line');
             expect(beatLines[5].class).toEqual('sh-clip-beat-line');
             expect(beatLines[15].class).toEqual('sh-clip-bar-line');
+        })
+    }),
+
+    describe('octaveLabelPitch', () => {
+        it('returns 0 if scale not set', () => {
+            expect(cmp.vm.octaveLabelPitch).toEqual(0);
+        }),
+        it('returns 1 when filtering by D major scale', async () => {
+            await cmp.setProps({ scale: ScaleTemplate.major.create(2) });
+            expect(cmp.vm.octaveLabelPitch).toEqual(1);
         })
     })
 });
