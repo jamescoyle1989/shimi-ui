@@ -16,8 +16,7 @@
             <svg :viewBox="'0 0 ' + (clipDuration * beatWidth) + ' ' + (128 * pitchHeight)"
                 preserveAspectRatio="none" fill="#666666"
                 ref="svgElement" class="sh-clip-edit-area"
-                @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp"
-                @mouseleave="onMouseUp" @contextmenu="onRightClick"
+                @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp" @mouseleave="onMouseUp"
                 :width="clipDuration * beatWidth" :height="128 * pitchHeight">
 
                 <rect x="0" y="0" :width="clipDuration * beatWidth" :height="128 * pitchHeight" fill="#666"/>
@@ -192,7 +191,13 @@ export default {
         },
 
         onMouseDown(evt) {
-            if (evt.button != 0 || !this.clip)
+            if (!this.clip)
+                return;
+            if (evt.button == 1) {
+                this.removeNote(evt);
+                return;
+            }
+            if (evt.button != 0)
                 return;
             
             const beat = this.getCursorBeat(evt);
@@ -230,14 +235,17 @@ export default {
                 this.clip.notes = this.clip.notes.filter(x => x !== this.selectedNote);
             this.selectedNote = null;
         },
-        onRightClick(evt) {
+
+        removeNote(evt) {
             if (!this.clip)
                 return;
             const beat = this.getCursorBeat(evt);
             const pitch = this.getCursorPitch(evt);
             const note = this.clipNotes.find(x => x.pitch == pitch && x.contains(beat));
-            if (note)
-                this.clip.notes = this.clip.notes.filter(x => x !== this.selectedNote);
+            if (note) {
+                this.clip.notes = this.clip.notes.filter(x => x !== note);
+                evt.preventDefault();
+            }
             this.selectedNote = null;
             this.dragMode = null;
             this.dragOffset = 0;

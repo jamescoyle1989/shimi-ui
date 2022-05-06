@@ -13,6 +13,7 @@
   "unpkg": "dist/shimi-ui.min.js",
   "dependencies": {
     "core-js": "^3.6.5",
+    "shimi": "^0.4.1",
     "vue": "^2.6.11"
   },
   "devDependencies": {
@@ -39,8 +40,8 @@
       "parser": "babel-eslint"
     },
     "rules": {
-        "no-unused-vars": "off",
-        "no-empty": "off"
+      "no-unused-vars": "off",
+      "no-empty": "off"
     },
     "overrides": [
       {
