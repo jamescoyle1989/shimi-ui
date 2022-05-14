@@ -124,5 +124,21 @@ describe('ClipEditor', () => {
             await cmp.setProps({ minPitch: 25, maxPitch: 20 });
             expect(cmp.vm.safeMaxPitch).toEqual(25);
         })
+    }),
+
+    describe('pitchAboveIsSameColor', () => {
+        it('returns false when white pitch and black pitch is above', () => {
+            expect(cmp.vm.pitchAboveIsSameColor(24)).toBeFalsy();
+        }),
+        it('returns true when white pitch and black pitch is above', () => {
+            expect(cmp.vm.pitchAboveIsSameColor(23)).toBeTruthy();
+        }),
+        it('returns false when black pitch and white pitch is above', () => {
+            expect(cmp.vm.pitchAboveIsSameColor(25)).toBeFalsy();
+        }),
+        it('returns true when black pitch and black pitch is above', async () => {
+            await cmp.setProps({ scale: ScaleTemplate.major.create(1) });
+            expect(cmp.vm.pitchAboveIsSameColor(25)).toBeTruthy();
+        })
     })
 });

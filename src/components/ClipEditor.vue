@@ -6,7 +6,11 @@
             <div ref="pianoBar" class="sh-clip-pianobar">
 
                 <div v-for="p of pitches" :key="p"
-                    :class="pitchIsBlack(p) ? 'sh-clip-black-key' : 'sh-clip-white-key'"
+                    :class="{
+                        'sh-clip-black-key': pitchIsBlack(p),
+                        'sh-clip-white-key': !pitchIsBlack(p),
+                        'sh-clip-pitch-separator': pitchAboveIsSameColor(p)
+                    }"
                     :style="{height: pitchHeight + 'px'}">
 
                     <label v-if="p % 12 == octaveLabelPitch">{{getOctaveLabel(p)}}</label>
@@ -23,6 +27,11 @@
 
                 <rect v-for="p of blackPitches" :key="'p' + p"
                     x="0" :y="getPitchY(p)" :width="clipDuration * beatWidth" :height="pitchHeight" fill="#555"/>
+
+                <line v-for="p of pitches.filter(x => pitchAboveIsSameColor(x))" :key="'ps' + p"
+                    x1="0" :y1="getPitchY(p)"
+                    :x2="clipDuration * beatWidth" :y2="getPitchY(p)"
+                    class="sh-clip-pitch-separator"/>
 
                 <line v-for="line of beatLines" :key="'b' + line.beat"
                     :x1="line.beat * beatWidth" y1="-10"
@@ -171,11 +180,9 @@ export default {
             return output;
         },
         safeMinPitch() {
-            console.log('MinPitch:', this.minPitch);
             return Math.min(Math.max(0, Number(this.minPitch)), 127);
         },
         safeMaxPitch() {
-            console.log('MaxPitch:', this.maxPitch);
             let output = Math.min(Math.max(0, Number(this.maxPitch)), 127);
             if (output < this.safeMinPitch)
                 output = this.safeMinPitch;
@@ -186,6 +193,12 @@ export default {
         pitchIsBlack(pitch) {
             const m = pitch % 12;
             return m == 1 || m == 3 || m == 6 || m == 8 || m == 10;
+        },
+        pitchAboveIsSameColor(pitch) {
+            const index = this.pitches.indexOf(pitch);
+            if (index == 0)
+                return false;
+            return this.pitchIsBlack(pitch) == this.pitchIsBlack(this.pitches[index - 1]);
         },
         getNoteColor(clipNote) {
             return '#00FF00';
@@ -352,7 +365,7 @@ export default {
 }
 
 .sh-clip-white-key {
-    background-color: #FF8888;
+    background-color: lightgray;
 }
 
 .sh-clip-white-key > label {
@@ -361,7 +374,7 @@ export default {
 }
 
 .sh-clip-black-key {
-    background-color: #000000;
+    background-color: #222;
 }
 
 .sh-clip-black-key > label {
@@ -390,5 +403,17 @@ export default {
     stroke: #A0A0A0;
     stroke-width: 1;
     stroke-dasharray: 2,5;
+}
+
+line.sh-clip-pitch-separator {
+    stroke: gray;
+    stroke-width: 1;
+}
+
+div.sh-clip-pitch-separator {
+    border-top-color: gray;
+    border-top-width: 1;
+    border-top-style: solid;
+    box-sizing: border-box;
 }
 </style>
