@@ -1,5 +1,5 @@
 <template>
-    <div class="sh-clip">
+    <div :style="{width: width, height: height}">
         <div ref="scroller" class="sh-clip-scroller">
 
             <!-- Left piano bar -->
@@ -85,6 +85,14 @@ export default {
         maxPitch: {
             type: Number,
             default: 127
+        },
+        width: {
+            type: String,
+            default: '1200px'
+        },
+        height: {
+            type: String,
+            default: '800px'
         }
     },
     data: () => {
@@ -348,14 +356,9 @@ export default {
 
 
 <style scoped>
-.sh-clip {
-    width: 1200px;
-    height: 800px;
-}
-
 .sh-clip-scroller {
     overflow: auto;
-    max-height: 94.5%;
+    max-height: 100%;
     position: relative;
 }
 
