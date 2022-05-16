@@ -93,6 +93,18 @@ export default {
         height: {
             type: String,
             default: '800px'
+        },
+        addNote: {
+            type: [Boolean, Function],
+            default: true
+        },
+        editNote: {
+            type: [Boolean, Function],
+            default: true
+        },
+        deleteNote: {
+            type: [Boolean, Function],
+            default: true
         }
     },
     data: () => {
@@ -254,6 +266,21 @@ export default {
                 return 'C' + (Math.floor(pitch / 12) - 1);
             return this.scale.getPitchName(pitch, true);
         },
+        canAddNote(note) {
+            if (this.addNote == true || this.addNote == false)
+                return this.addNote;
+            return this.addNote(note);
+        },
+        canEditNote(note) {
+            if (this.editNote == true || this.editNote == false)
+                return this.editNote;
+            return this.editNote(note);
+        },
+        canDeleteNote(note) {
+            if (this.deleteNote == true || this.deleteNote == false)
+                return this.deleteNote;
+            return this.deleteNote(note);
+        },
 
         onMouseDown(evt) {
             if (!this.clip)
@@ -308,6 +335,8 @@ export default {
             const pitch = this.getCursorPitch(evt);
             const note = this.clipNotes.find(x => x.pitch == pitch && x.contains(beat));
             if (note) {
+                if (!this.canDeleteNote(note))
+                    return;
                 this.clip.notes = this.clip.notes.filter(x => x !== note);
                 evt.preventDefault();
             }
@@ -322,12 +351,16 @@ export default {
             if (beat + noteDuration > this.clipDuration)
                 noteDuration = this.clipDuration - beat;
             const clipNote = new ClipNote(beat, noteDuration, pitch, 80);
+            if (!this.canAddNote(clipNote))
+                return;
             this.clip.notes.push(clipNote);
             this.selectedNote = clipNote;
             this.dragMode = 'end';
             this.dragOffset = 0;
         },
         beginNoteDrag(mouseBeat) {
+            if (!this.canEditNote(this.selectedNote))
+                return;
             const noteWidth = this.selectedNote.duration * this.beatWidth;
             const startXDiff = (mouseBeat - this.selectedNote.start) * this.beatWidth;
             const endXDiff = (this.selectedNote.end - mouseBeat) * this.beatWidth;
