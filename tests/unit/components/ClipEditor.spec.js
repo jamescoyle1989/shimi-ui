@@ -62,8 +62,13 @@ describe('ClipEditor', () => {
     }),
 
     describe('getNoteColor', () => {
-        it('returns ugly green color', () => {
-            expect(cmp.vm.getNoteColor(new ClipNote(0, 1, 60, 80))).toEqual('#00FF00');
+        it('returns less ugly green color by default', () => {
+            expect(cmp.vm.getNoteColor(new ClipNote(0, 1, 60, 80))).toEqual('#07A340');
+        }),
+        it('returns function value if function set', async () => {
+            await cmp.setProps({ noteColor: (note, isSelected) => note.pitch < 60 ? '#FFF000' : '#000FFF'});
+            expect(cmp.vm.getNoteColor(new ClipNote(0, 1, 48, 80))).toEqual('#FFF000');
+            expect(cmp.vm.getNoteColor(new ClipNote(0, 1, 72, 80))).toEqual('#000FFF');
         })
     }),
 

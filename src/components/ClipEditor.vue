@@ -105,6 +105,10 @@ export default {
         deleteNote: {
             type: [Boolean, Function],
             default: true
+        },
+        noteColor: {
+            type: [String, Function],
+            default: '#07A340'
         }
     },
     data: () => {
@@ -221,7 +225,10 @@ export default {
             return this.pitchIsBlack(pitch) == this.pitchIsBlack(this.pitches[index - 1]);
         },
         getNoteColor(clipNote) {
-            return '#00FF00';
+            if (typeof this.noteColor === 'string')
+                return this.noteColor;
+            const isSelected = clipNote === this.selectedNote;
+            return this.noteColor(clipNote, isSelected);
         },
         getCursorBeat(evt) {
             this.svgPoint.x = evt.clientX;
