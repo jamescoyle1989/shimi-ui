@@ -395,7 +395,7 @@ export default {
 </script>
 
 
-<style scoped>
+<style>
 .sh-clip-scroller {
     overflow: auto;
     max-height: 100%;
