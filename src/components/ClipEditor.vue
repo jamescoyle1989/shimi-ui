@@ -13,7 +13,8 @@
                     }"
                     :style="{height: pitchHeight + 'px'}">
 
-                    <label v-if="p % 12 == octaveLabelPitch">{{getOctaveLabel(p)}}</label>
+                    <label v-if="p % 12 == octaveLabelPitch"
+                        :style="{fontSize: pitchHeight - 1}">{{getOctaveLabel(p)}}</label>
                 </div>
             </div>
 
@@ -413,7 +414,7 @@ export default {
 
 .sh-clip-white-key > label {
     font-family: sans-serif;
-    font-size: 8px;
+    margin-left: 2px;
 }
 
 .sh-clip-black-key {
@@ -422,8 +423,8 @@ export default {
 
 .sh-clip-black-key > label {
     font-family: sans-serif;
-    font-size: 8px;
     color: white;
+    margin-left: 2px;
 }
 
 .sh-clip-edit-area {
