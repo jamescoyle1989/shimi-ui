@@ -2,6 +2,8 @@
   "name": "shimi-ui",
   "version": "0.1.0",
   "private": false,
+  "author": "James Coyle",
+  "license": "MIT",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "npm run build:wc & npm run build:lib",
