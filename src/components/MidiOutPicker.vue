@@ -19,7 +19,7 @@ export default {
         portNames() {
             if (!this.midiAccess)
                 return [];
-            return this.midiAccess.getOutPorts();
+            return this.midiAccess.getOutPortNames();
         },
         selectedPortName: {
             get() {
